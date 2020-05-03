@@ -1,0 +1,8 @@
+*
+!.gitignore
+!.gitmodules
+!CMakeLists.txt
+!*.h
+!*.cpp
+!jeraptha.cfg
+!jeraptha.dat
