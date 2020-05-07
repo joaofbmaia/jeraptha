@@ -51,6 +51,9 @@ void configuration::readFile(void) {
         else if (name == "adminRoleID") {
             adminRoleID = value;
         }
+        else if (name == "defaultChannelID") {
+            defaultChannelID = value;
+        }
         else {
             std::cerr << "Unknown parameter in config file!" << std::endl;
             exit(EXIT_FAILURE);
@@ -76,6 +79,7 @@ void configuration::writeFile(void) {
     file << std::string("serverID=") << serverID << std::endl;
     file << std::string("ownerID=") << ownerID << std::endl;
     file << std::string("adminRoleID=") << adminRoleID << std::endl;
+    file << std::string("defaultChannelID=") << defaultChannelID << std::endl;
 
     file.close();
 }

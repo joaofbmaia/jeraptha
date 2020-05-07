@@ -12,7 +12,8 @@ public:
     using SleepyDiscord::DiscordClient::DiscordClient;
     jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads);
     configuration *config;
-    engine *gameEngine;
+    engine *wageringEngine;
     void onReady(std::string *jsonMessage);
+    void onMember(std::string *jsonMessage);
     void onMessage(SleepyDiscord::Message message);
 };

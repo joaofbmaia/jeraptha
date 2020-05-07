@@ -10,6 +10,7 @@ class configuration {
         std::string serverID;
         std::string ownerID;
         std::string adminRoleID;
+        std::string defaultChannelID;
         void writeFile(void);
     private:
         void readFile(void);

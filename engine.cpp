@@ -3,10 +3,62 @@
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <algorithm>
+#include <ctime>
 
 engine::engine(std::string filename) {
     _filename = filename;
     readFile();
+}
+
+int engine::balance(std::string ID) {
+    std::list <bettor>::iterator it;
+    it = std::find(bettorList.begin(), bettorList.end(), ID);
+
+    return it->balance;
+}
+
+int engine::drawCoins(std::string ID) {
+    std::list <bettor>::iterator it;
+    it = std::find(bettorList.begin(), bettorList.end(), ID);
+
+    if (time(NULL) - it->lastDrawTime < 86400) {
+        return -1;
+    }
+
+    it->lastDrawTime = time(NULL);
+
+    int newCoins = eco.drawCoins();
+    it->balance += newCoins;
+    
+    writeFile();
+
+    return newCoins;
+}
+
+std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
+    std::list <std::string> newBettors;
+
+    for (auto it = membersList->begin(); it != membersList->end(); it++) {
+        auto res = std::find(bettorList.begin(), bettorList.end(), *it);
+        // if new member is found
+        if (res == bettorList.end()) {
+            // add to bettorList
+            bettor auxBettor;
+            auxBettor.ID = *it;
+            auxBettor.balance = eco.drawInitialCoins();
+            auxBettor.plays = 0;
+            auxBettor.wins = 0;
+            auxBettor.lastDrawTime  = 0;
+            bettorList.push_back(auxBettor);
+            // add ID to return list
+            newBettors.push_back(*it);
+        }
+    }
+
+    writeFile();
+
+    return newBettors;
 }
 
 void engine::readFile() {

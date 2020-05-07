@@ -3,12 +3,66 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
-: SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), gameEngine(gameEngine) {}
+: SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), wageringEngine(gameEngine) {}
 
 void jerapthaClient::onReady(std::string *jsonMessage) {
+    // Construct list with all members IDs as strings
+    //auto members = listMembers(config->serverID).list();
+    std::list <std::string> membersIDs;
+    auto members = listMembers(config->serverID, 100).vector();
 
+    for (auto it = members.begin(); it != members.end(); it++) {
+        // exclude bots
+        if (!it->user.bot) {
+            membersIDs.push_back(std::string(it->user.ID));
+            //std::cout << std::string(it->user.ID) << std::endl;
+        }
+    }
+
+    // call engine function to check new members and draw them initial coins
+    std::list <std::string> newMembers;
+    newMembers = wageringEngine->checkNewBettors(&membersIDs);
+
+    // print results
+    std::stringstream buffer;
+    for (auto it = newMembers.begin(); it != newMembers.end(); it++) {
+        buffer << "Welcome <@" << *it << ">, here's " << wageringEngine->balance(*it) << " credits to get you going!" << "\\n";
+    }
+    if (buffer.str().size() != 0) {
+        sendMessage(config->defaultChannelID, buffer.str());
+    }
+}
+
+
+void jerapthaClient::onMember(std::string *jsonMessage) {
+    // Construct list with all members IDs as strings
+    //auto members = listMembers(config->serverID).list();
+    std::list <std::string> membersIDs;
+    auto members = listMembers(config->serverID, 100).vector();
+
+    for (auto it = members.begin(); it != members.end(); it++) {
+        // exclude bots
+        if (!it->user.bot) {
+            membersIDs.push_back(std::string(it->user.ID));
+            //std::cout << std::string(it->user.ID) << std::endl;
+        }
+    }
+
+    // call engine function to check new members and draw them initial coins
+    std::list <std::string> newMembers;
+    newMembers = wageringEngine->checkNewBettors(&membersIDs);
+
+    // print results
+    std::stringstream buffer;
+    for (auto it = newMembers.begin(); it != newMembers.end(); it++) {
+        buffer << "Welcome <@" << *it << ">, here's " << wageringEngine->balance(*it) << " credits to get you going!" << "\\n";
+    }
+    if (buffer.str().size() != 0) {
+        sendMessage(config->defaultChannelID, buffer.str());
+    }
 }
 
 void jerapthaClient::onMessage(SleepyDiscord::Message message) {
@@ -69,6 +123,25 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
             else {
                 sendMessage(message.channelID, "You do not have permission to use this command.");
+            }
+        }
+
+        // balance
+        command = "balance";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            int bal = wageringEngine->balance(message.author.ID);
+            sendMessage(message.channelID, message.author.username + std::string(", you have a balace of ") + std::to_string(bal) + std::string(" credits."));
+        }
+
+        // daily
+        command = "daily";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            int coins = wageringEngine->drawCoins(message.author.ID);
+            if (coins >= 0) {
+                sendMessage(message.channelID, message.author.username + std::string(", you have received ") + std::to_string(coins) + std::string(" credits."));
+            }
+            else {
+                sendMessage(message.channelID, message.author.username + std::string(", you've already redeemed you credits today."));
             }
         }
 
