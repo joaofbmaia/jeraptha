@@ -6,10 +6,11 @@
 #include <ctime>
 #include <fstream>
 
-wager::wager(int ID_, std::string description_, std::string creatorID_, std::time_t date_) 
-: ID(ID_), description(description_), creatorID(creatorID_), date(date_) {}
+wager::wager() 
+: ID(-1), date(0), active(0), canceled(0), outcome(0) {}
 
-wager::wager() {}
+wager::wager(int ID_, std::string description_, std::string creatorID_, std::time_t date_) 
+: ID(ID_), description(description_), creatorID(creatorID_), date(date_), active(1), canceled(0), outcome(0) {}
 
 wager::wager(const wager &obj) {
     ID = obj.ID;
@@ -43,7 +44,8 @@ std::istream &operator>>(std::istream &in,  wager &obj) {
     obj.betList.clear();
 
     in >> obj.ID;
-    in >> obj.description;
+    in.ignore(); //ignore newline
+    std::getline(in, obj.description);
     in >> obj.creatorID;
     in >> obj.date;
     in >> obj.active;

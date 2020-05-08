@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <list>
+#include <ctime>
 
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
 : SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), wageringEngine(gameEngine) {}
@@ -146,9 +147,16 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
         }
 
         // register wager <description>
-        command = "register wager";
+        command = "register wager ";
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
-        
+            std::string description = message.content.substr(config->prefix.length() + command.length());
+            if (description.length() != 0) {
+                wageringEngine->registerWager(description, message.author.ID, time(NULL));
+                sendMessage(message.channelID, std::string("Registered wager \\\"") + description + std::string("\\\"."));
+            }
+            else {
+                sendMessage(message.channelID, std::string("Invalid format."));
+            }
         }
 
     }
