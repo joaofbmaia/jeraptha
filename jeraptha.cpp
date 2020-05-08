@@ -130,7 +130,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
         command = "balance";
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
             int bal = wageringEngine->balance(message.author.ID);
-            sendMessage(message.channelID, message.author.username + std::string(", you have a balace of ") + std::to_string(bal) + std::string(" credits."));
+            sendMessage(message.channelID, message.author.username + std::string(", you have a balance of ") + std::to_string(bal) + std::string(" credits."));
         }
 
         // daily
