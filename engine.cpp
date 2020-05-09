@@ -77,7 +77,6 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
         if (bettorID == it->bettorID && outcome == it->outcome) {
             bettorIt->balance -= value;
             it->value += value;
-            eco.destroyCoins(BET_TAX_RATE * value);
             writeFile();
             return 1; // Repeated bet but okay
         }
@@ -90,7 +89,6 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
 
     bettorIt->balance -= value;
     wagerPtr->betList.push_back(auxBet);
-    eco.destroyCoins(BET_TAX_RATE * value);
 
     writeFile();
 
