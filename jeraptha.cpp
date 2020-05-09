@@ -151,8 +151,8 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
             std::string description = message.content.substr(config->prefix.length() + command.length());
             if (description.length() != 0) {
-                wageringEngine->registerWager(description, message.author.ID, time(NULL));
-                sendMessage(message.channelID, std::string("Registered wager \\\"") + description + std::string("\\\"."));
+                int wagerID = wageringEngine->registerWager(description, message.author.ID, time(NULL));
+                sendMessage(message.channelID, std::string("Registered wager \\\"") + description + std::string("\\\" with ID ") + std::to_string(wagerID));
             }
             else {
                 sendMessage(message.channelID, std::string("Invalid format."));

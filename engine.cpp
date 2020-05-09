@@ -36,11 +36,12 @@ int engine::drawCoins(std::string ID) {
     return newCoins;
 }
 
-void engine::registerWager(std::string description, std::string creatorID, std::time_t date) {
+int engine::registerWager(std::string description, std::string creatorID, std::time_t date) {
     int wagerID = wagerList.size() + 1;
     wager auxWager(wagerID, description, creatorID, date);
     wagerList.push_back(auxWager);
     writeFile();
+    return wagerID;
 }
 
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
