@@ -15,7 +15,7 @@ class engine {
         int drawCoins(std::string ID);
         int registerWager(std::string description, std::string creatorID, std::time_t date);
         std::list <int> listActiveWagers();
-        int addBet(int wagerID, bool outcome, int value);
+        int addBet(std::string bettorID, int wagerID, bool outcome, int value);
         void settle(int wagerID, bool outcome);
         void cancel(int wagerID);
         std::list <std::string> checkNewBettors(std::list <std::string> *membersList);

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <list>
 #include <ctime>
+#include <stdio.h>
 
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
 : SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), wageringEngine(gameEngine) {}
@@ -175,6 +176,35 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
             else {
                 sendMessage(message.channelID, std::string("No active wagers :disappointed_relieved:\\nWhy don't you register one?"));
+            }
+        }
+
+        // bet <wagerID> <yes/no> <credits>
+        command = "bet ";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            std::string rawBet = message.content.substr(config->prefix.length() + command.length());
+            int wagerID;
+            char outcomeString[4];
+            int value;
+            bool outcome;
+
+            int ret = sscanf(rawBet.c_str(), "%d %3s %d", &wagerID, outcomeString, &value); 
+            if (ret != 3 || (strcmp(outcomeString, "yes") != 0 && strcmp(outcomeString, "no") != 0)) {
+                sendMessage(message.channelID, std::string("Invalid format."));
+            }
+            else {
+                if (strcmp(outcomeString, "yes") == 0) outcome = true;
+                else outcome = false;
+                int allowed = wageringEngine->addBet(message.author.ID, wagerID, outcome, value);
+                if (allowed == 1) {
+                    sendMessage(message.channelID, message.author.username + std::string(" bet ") + std::to_string(value) + std::string(" credits on ") + (outcome ? std::string("YES") : std::string("NO")) + std::string(" for \\\"") + wageringEngine->getWager(wagerID)->description + std::string(" \\\"."));
+                }
+                else if (allowed == 0) {
+                    sendMessage(message.channelID, message.author.username + std::string(", you do not have enough credits to make this bet."));
+                }
+                else {
+                    sendMessage(message.channelID, std::string("There's no wager with that ID."));
+                }
             }
         }
 

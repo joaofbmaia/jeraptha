@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <ctime>
 
+#define BET_TAX_RATE 0.05
+
 engine::engine(std::string filename) {
     _filename = filename;
     readFile();
@@ -54,6 +56,45 @@ std::list <int> engine::listActiveWagers() {
     }
 
     return activeWagers;
+}
+
+int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
+    auto wagerPtr = getWager(wagerID);
+    if (wagerPtr == nullptr) {
+        return -1; // No bet with that id
+    }
+    if (!wagerPtr->active) {
+        return -2; // No active bet with that id
+    }
+
+    auto bettorIt = std::find(bettorList.begin(), bettorList.end(), bettorID);
+    if (bettorIt->balance < value) {
+        return 0; // No balance
+    }
+
+    for (auto it = wagerPtr->betList.begin(); it != wagerPtr->betList.end(); it++) {
+        // if there's already a similar bet by this bettor
+        if (bettorID == it->bettorID && outcome == it->outcome) {
+            bettorIt->balance -= value;
+            it->value += value;
+            eco.destroyCoins(BET_TAX_RATE * value);
+            writeFile();
+            return 1; // Repeated bet but okay
+        }
+    }
+    
+    bet auxBet;
+    auxBet.bettorID = bettorID;
+    auxBet.outcome = outcome;
+    auxBet.value = value;
+
+    bettorIt->balance -= value;
+    wagerPtr->betList.push_back(auxBet);
+    eco.destroyCoins(BET_TAX_RATE * value);
+
+    writeFile();
+
+    return 1; // New bet okay
 }
 
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {

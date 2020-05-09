@@ -1,5 +1,4 @@
 #include "wager.h"
-#include "bet.h"
 
 #include <string>
 #include <list>

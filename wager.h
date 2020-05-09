@@ -5,8 +5,12 @@
 #include <ctime>
 
 #include "bettor.h"
-#include "bet.h"
 
+struct bet {
+    std::string bettorID;
+    bool outcome;
+    int value;
+};
 
 class wager {
     public:
