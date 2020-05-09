@@ -63,3 +63,13 @@ std::istream &operator>>(std::istream &in,  wager &obj) {
 
     return in;
 }
+
+bool wager::operator==(const int& ID_) {
+	return ID == ID_;
+}
+
+int wager::odds(bool outcome) {
+    //PLACEHOLDER
+    if (outcome) return 35;
+    else return 65;
+}

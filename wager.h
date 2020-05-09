@@ -16,6 +16,7 @@ class wager {
 
         friend std::ostream &operator<<(std::ostream &out, const wager &obj);
         friend std::istream &operator>>(std::istream &in,  wager &obj);
+        bool operator==(const int& ID_);
 
         int ID;
         std::string description;
@@ -23,7 +24,6 @@ class wager {
         std::time_t date;
         int odds(bool outcome);
         int openInterest();
-    private:
         bool active;
         bool canceled;
         bool outcome;

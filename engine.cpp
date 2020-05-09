@@ -44,6 +44,18 @@ int engine::registerWager(std::string description, std::string creatorID, std::t
     return wagerID;
 }
 
+std::list <int> engine::listActiveWagers() {
+    std::list <int> activeWagers;
+
+    for (auto it = wagerList.begin(); it != wagerList.end(); it++) {
+        if (it->active) {
+            activeWagers.push_back(it->ID);
+        }
+    }
+
+    return activeWagers;
+}
+
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
     std::list <std::string> newBettors;
 
@@ -67,6 +79,15 @@ std::list <std::string> engine::checkNewBettors(std::list <std::string> *members
     writeFile();
 
     return newBettors;
+}
+
+wager *engine::getWager(int wagerID) {
+    auto res = std::find(wagerList.begin(), wagerList.end(), wagerID);
+    // if a matching is found
+    if (res != wagerList.end()) {
+        return &*res;
+    }
+    return nullptr;
 }
 
 void engine::readFile() {

@@ -159,6 +159,25 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
         }
 
+        // list wagers
+        command = "list wagers";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            auto activeWagers = wageringEngine->listActiveWagers();
+            std::stringstream buffer;
+
+            for (auto it = activeWagers.begin(); it != activeWagers.end(); it++) {
+                buffer << std::to_string(*it) << ": " << wageringEngine->getWager(*it)->description << "\\n";
+                buffer << ":white_check_mark: " << wageringEngine->getWager(*it)->odds(true) << "% | :x: " << wageringEngine->getWager(*it)->odds(false) << "%" << "\\n\\n";
+            }
+
+            if (buffer.str().size() != 0) {
+                sendMessage(message.channelID, buffer.str());
+            }
+            else {
+                sendMessage(message.channelID, std::string("No active wagers :disappointed_relieved:\\nWhy don't you register one?"));
+            }
+        }
+
     }
     
     //DM's + server messages
