@@ -160,11 +160,16 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
             else {
                 int wagerID = wageringEngine->registerWager(std::string(descriptionString), message.author.ID, time(NULL), duration);
-                if (duration > 0) {
-                    sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and a duration of ") + std::to_string(duration) + std::string(" days."));
+                if (wagerID == -1) {
+                    sendMessage(message.channelID, message.author.username + std::string(", you don't have enough credits to register a wager."));
                 }
                 else {
-                    sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and indefinite duration."));
+                    if (duration > 0) {
+                        sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and a duration of ") + std::to_string(duration) + std::string(" days.\\nIt cost you 5 credits."));
+                    }
+                    else {
+                        sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and indefinite duration.\\nIt cost you 5 credits."));
+                    }
                 }
             }
         }

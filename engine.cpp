@@ -7,6 +7,7 @@
 #include <ctime>
 
 #define BET_TAX_RATE 0.05
+#define WAGER_PRICE 5
 
 engine::engine(std::string filename) {
     _filename = filename;
@@ -39,6 +40,13 @@ int engine::drawCoins(std::string ID) {
 }
 
 int engine::registerWager(std::string description, std::string creatorID, std::time_t date, int duration) {
+    auto bettorIt = std::find(bettorList.begin(), bettorList.end(), creatorID);
+    if (bettorIt->balance < WAGER_PRICE) {
+        return -1; // No balance
+    }
+    bettorIt->balance -= WAGER_PRICE;
+    eco.destroyCoins(WAGER_PRICE);
+
     int wagerID = wagerList.size() + 1;
     wager auxWager(wagerID, description, creatorID, date, duration);
     wagerList.push_back(auxWager);
