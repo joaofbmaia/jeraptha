@@ -75,8 +75,8 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
     if (wagerPtr == nullptr) {
         return -1; // No bet with that id
     }
-    if (!wagerPtr->active) {
-        return -2; // No active bet with that id
+    if (!wagerPtr->open) {
+        return -2; // No open bet with that id
     }
 
     auto bettorIt = std::find(bettorList.begin(), bettorList.end(), bettorID);

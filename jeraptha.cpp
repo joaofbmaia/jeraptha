@@ -182,7 +182,11 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
 
             for (auto it = activeWagers.begin(); it != activeWagers.end(); it++) {
                 buffer << std::to_string(*it) << ": " << wageringEngine->getWager(*it)->description << "\\n";
-                buffer << ":white_check_mark: " << wageringEngine->getWager(*it)->odds(true) << "% | :x: " << wageringEngine->getWager(*it)->odds(false) << "%" << "\\n\\n";
+                buffer << ":white_check_mark: " << wageringEngine->getWager(*it)->odds(true) << "% | :x: " << wageringEngine->getWager(*it)->odds(false) << "%";
+                if (!wageringEngine->getWager(*it)->open) {
+                    buffer << " (Closed)";
+                }
+                buffer << "\\n\\n";
             }
 
             if (buffer.str().size() != 0) {
@@ -218,6 +222,9 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 }
                 else if (allowed == -3) {
                     sendMessage(message.channelID, std::string("You can only bet positive ammounts."));
+                }
+                else if (allowed == -2) {
+                    sendMessage(message.channelID, std::string("That wager is closed."));
                 }
                 else {
                     sendMessage(message.channelID, std::string("There's no wager with that ID."));
