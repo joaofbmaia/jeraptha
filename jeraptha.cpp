@@ -202,6 +202,9 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 else if (allowed == 0) {
                     sendMessage(message.channelID, message.author.username + std::string(", you do not have enough credits to make this bet."));
                 }
+                else if (allowed == -3) {
+                    sendMessage(message.channelID, std::string("You can only bet positive ammounts."));
+                }
                 else {
                     sendMessage(message.channelID, std::string("There's no wager with that ID."));
                 }

@@ -59,6 +59,10 @@ std::list <int> engine::listActiveWagers() {
 }
 
 int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
+    if (value <= 0) {
+        return -3; // Negative or zero bet
+    }
+
     auto wagerPtr = getWager(wagerID);
     if (wagerPtr == nullptr) {
         return -1; // No bet with that id
