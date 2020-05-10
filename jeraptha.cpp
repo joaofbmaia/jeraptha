@@ -147,16 +147,25 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
         }
 
-        // register wager <description>
+        // register wager <description> <duration>
         command = "register wager ";
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
-            std::string description = message.content.substr(config->prefix.length() + command.length());
-            if (description.length() != 0) {
-                int wagerID = wageringEngine->registerWager(description, message.author.ID, time(NULL));
-                sendMessage(message.channelID, std::string("Registered wager \\\"") + description + std::string("\\\" with ID ") + std::to_string(wagerID));
+            std::string rawWager = message.content.substr(config->prefix.length() + command.length());
+            char descriptionString[512];
+            int duration;
+
+            int ret = sscanf(rawWager.c_str(), "%d %10[^\n]", &duration, descriptionString);
+            if (ret != 2 || strlen(descriptionString) == 0 || duration < 0) {
+                sendMessage(message.channelID, std::string("Invalid format."));
             }
             else {
-                sendMessage(message.channelID, std::string("Invalid format."));
+                int wagerID = wageringEngine->registerWager(std::string(descriptionString), message.author.ID, time(NULL), duration);
+                if (duration > 0) {
+                    sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and a duration of ") + std::to_string(duration) + std::string(" days."));
+                }
+                else {
+                    sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and indefinite duration."));
+                }
             }
         }
 

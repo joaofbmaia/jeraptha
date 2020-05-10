@@ -38,9 +38,9 @@ int engine::drawCoins(std::string ID) {
     return newCoins;
 }
 
-int engine::registerWager(std::string description, std::string creatorID, std::time_t date) {
+int engine::registerWager(std::string description, std::string creatorID, std::time_t date, int duration) {
     int wagerID = wagerList.size() + 1;
-    wager auxWager(wagerID, description, creatorID, date);
+    wager auxWager(wagerID, description, creatorID, date, duration);
     wagerList.push_back(auxWager);
     writeFile();
     return wagerID;

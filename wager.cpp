@@ -6,25 +6,27 @@
 #include <fstream>
 
 wager::wager() 
-: ID(-1), date(0), active(0), canceled(0), outcome(0) {}
+: ID(-1), date(0), duration(0), active(0), open(0), canceled(0), outcome(0) {}
 
-wager::wager(int ID_, std::string description_, std::string creatorID_, std::time_t date_) 
-: ID(ID_), description(description_), creatorID(creatorID_), date(date_), active(1), canceled(0), outcome(0) {}
+wager::wager(int ID_, std::string description_, std::string creatorID_, std::time_t date_, int duration_) 
+: ID(ID_), description(description_), creatorID(creatorID_), date(date_), duration(duration_), active(1), open(1), canceled(0), outcome(0) {}
 
 wager::wager(const wager &obj) {
     ID = obj.ID;
     description = obj.description;
     creatorID = obj.creatorID;
     date = obj.date;
+    duration = obj.duration;
     active = obj.active;
+    open = obj.open;
     canceled = obj.canceled;
     outcome = obj.outcome;
     betList = obj.betList;
 }
 
 std::ostream &operator<<(std::ostream &out, const wager &obj) {
-    out << obj.ID << "\n" << obj.description << "\n" << obj.creatorID << "\n" << obj.date <<  std::endl;
-    out << obj.active << "\n" << obj.canceled << "\n" << obj.outcome << std::endl;
+    out << obj.ID << "\n" << obj.description << "\n" << obj.creatorID << "\n" << obj.date << "\n" << obj.duration <<  std::endl;
+    out << obj.active << "\n" << obj.open << "\n" << obj.canceled << "\n" << obj.outcome << std::endl;
 
     out << obj.betList.size() << std::endl;
 
@@ -47,7 +49,9 @@ std::istream &operator>>(std::istream &in,  wager &obj) {
     std::getline(in, obj.description);
     in >> obj.creatorID;
     in >> obj.date;
+    in >> obj.duration;
     in >> obj.active;
+    in >> obj.open;
     in >> obj.canceled;
     in >> obj.outcome;
 

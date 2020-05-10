@@ -13,7 +13,7 @@ class engine {
         int balance(std::string ID);
         bool gift(std::string sourceID, std::string destinationID);
         int drawCoins(std::string ID);
-        int registerWager(std::string description, std::string creatorID, std::time_t date);
+        int registerWager(std::string description, std::string creatorID, std::time_t date, int duration);
         std::list <int> listActiveWagers();
         int addBet(std::string bettorID, int wagerID, bool outcome, int value);
         void settle(int wagerID, bool outcome);
