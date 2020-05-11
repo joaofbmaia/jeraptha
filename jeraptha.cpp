@@ -154,7 +154,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             char descriptionString[512];
             int duration;
 
-            int ret = sscanf(rawWager.c_str(), "%d %10[^\n]", &duration, descriptionString);
+            int ret = sscanf(rawWager.c_str(), "%d %511[^\n]", &duration, descriptionString);
             if (ret != 2 || strlen(descriptionString) == 0 || duration < 0) {
                 sendMessage(message.channelID, std::string("Invalid format."));
             }
@@ -182,7 +182,12 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
 
             for (auto it = activeWagers.begin(); it != activeWagers.end(); it++) {
                 buffer << std::to_string(*it) << ": " << wageringEngine->getWager(*it)->description << "\\n";
-                buffer << ":white_check_mark: " << wageringEngine->getWager(*it)->odds(true) << "% | :x: " << wageringEngine->getWager(*it)->odds(false) << "%";
+                if (wageringEngine->getWager(*it)->betList.size() != 0) {
+                    buffer << ":white_check_mark: " << wageringEngine->getWager(*it)->odds(true) << "% | :x: " << wageringEngine->getWager(*it)->odds(false) << "%";
+                }
+                else {
+                    buffer << "No bets yet! :disappointed_relieved:";
+                }
                 if (!wageringEngine->getWager(*it)->open) {
                     buffer << " (Closed)";
                 }
@@ -229,6 +234,48 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 else {
                     sendMessage(message.channelID, std::string("There's no wager with that ID."));
                 }
+            }
+        }
+
+        // wager settle <wagerID> <outcome>
+        command = "wager settle ";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            //check if author has admin role
+            auto roles = getMember(message.serverID, message.author.ID).cast().roles;
+            if (std::find(roles.begin(), roles.end(), config->adminRoleID) != roles.end()
+                || message.author.ID == config->ownerID) {
+                int wagerID;
+                char outcomeString[4];
+                int ret = sscanf(message.content.substr(config->prefix.length() + command.length()).c_str(), "%d %3s", &wagerID, outcomeString);
+                if (ret != 2 || (strcmp(outcomeString, "yes") != 0 && strcmp(outcomeString, "no") != 0)) {
+                    sendMessage(message.channelID, std::string("Invalid format."));
+                }
+                else {
+                    bool outcome;
+                    if (strcmp(outcomeString, "yes") == 0) outcome = true;
+                    else outcome = false;
+                    if (wageringEngine->getWager(wagerID) == nullptr) {
+                        sendMessage(message.channelID, std::string("There's no wager with that ID."));
+                    }
+                    else {
+                        auto prizeList = wageringEngine->settle(wagerID, outcome);
+                        if (prizeList.empty()) {
+                            sendMessage(message.channelID, std::string("There were no prizes for this wager."));
+                        }
+                        else {
+                            std::stringstream buffer;
+                            buffer << "The wager \\\"" << wageringEngine->getWager(wagerID)->description << "\\\" was settled to " << (outcome ? "YES" : "NO") << "!\\n";
+                            for (auto it = prizeList.begin(); it != prizeList.end(); it++) {
+                                buffer << "<@" << it->bettorID << "> won " << it->prize << " credits!\\n";
+                            }
+                            buffer << "Congratulations to the winners! :partying_face: :dollar:";
+                            sendMessage(message.channelID, buffer.str());
+                        }
+                    }
+                }
+            }
+            else {
+                sendMessage(message.channelID, "You do not have permission to use this command.");
             }
         }
 

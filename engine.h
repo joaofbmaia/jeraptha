@@ -7,6 +7,11 @@
 #include "wager.h"
 #include "economy.h"
 
+struct settleResponse {
+    std::string bettorID;
+    int prize;
+};
+
 class engine {
     public:
         engine(std::string filename);
@@ -16,7 +21,7 @@ class engine {
         int registerWager(std::string description, std::string creatorID, std::time_t date, int duration);
         std::list <int> listActiveWagers();
         int addBet(std::string bettorID, int wagerID, bool outcome, int value);
-        void settle(int wagerID, bool outcome);
+        std::list <settleResponse> settle(int wagerID, bool outcome);
         void cancel(int wagerID);
         std::list <std::string> checkNewBettors(std::list <std::string> *membersList);
         wager *getWager(int wagerID);

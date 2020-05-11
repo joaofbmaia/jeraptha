@@ -4,6 +4,7 @@
 #include <list>
 #include <ctime>
 #include <fstream>
+#include <cmath>
 
 wager::wager() 
 : ID(-1), date(0), duration(0), active(0), open(0), canceled(0), outcome(0) {}
@@ -72,7 +73,25 @@ bool wager::operator==(const int& ID_) {
 }
 
 int wager::odds(bool outcome) {
-    //PLACEHOLDER
-    if (outcome) return 35;
-    else return 65;
+    int sumTrue = 0;
+    int sumFalse = 0;
+    for (auto it = betList.begin(); it != betList.end(); it++) {
+        if (it->outcome == true) {
+            sumTrue += it->value;
+        }
+        else {
+            sumFalse += it->value;
+        }
+    }
+    int probTrue = std::round((double) sumTrue * 100 / (double) (sumTrue + sumFalse));
+    if (outcome) return probTrue;
+    else return 100 - probTrue;
+}
+
+int wager::openInterest() {
+    int sum = 0;
+    for (auto it = betList.begin(); it != betList.end(); it++) {
+        sum += it->value;
+    }
+    return sum;
 }

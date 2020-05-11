@@ -5,6 +5,7 @@
 #include <list>
 #include <algorithm>
 #include <ctime>
+#include <cmath>
 
 #define BET_TAX_RATE 0.05
 #define WAGER_PRICE 5
@@ -73,10 +74,10 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
 
     auto wagerPtr = getWager(wagerID);
     if (wagerPtr == nullptr) {
-        return -1; // No bet with that id
+        return -1; // No wager with that id
     }
     if (!wagerPtr->open) {
-        return -2; // No open bet with that id
+        return -2; // No open wager with that id
     }
 
     auto bettorIt = std::find(bettorList.begin(), bettorList.end(), bettorID);
@@ -105,6 +106,45 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
     writeFile();
 
     return 1; // New bet okay
+}
+
+std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
+    auto wagerPtr = getWager(wagerID);
+
+    wagerPtr->outcome = outcome;
+    wagerPtr->open = false;
+    wagerPtr->active = false;
+    wagerPtr->canceled = false;
+
+    int totalSum = 0;
+    int sumOutcome = 0;
+    int tempPrize;
+    int tax;
+    settleResponse tempResponse;
+    std::list <settleResponse> outputList;
+
+    for (auto it = wagerPtr->betList.begin(); it != wagerPtr->betList.end(); it++) {
+        if (it->outcome == outcome) {
+            sumOutcome += it->value;
+        }
+        totalSum += it->value;
+    }
+
+    for (auto it = wagerPtr->betList.begin(); it != wagerPtr->betList.end(); it++) {
+        if (it->outcome == outcome) {
+            tempPrize = std::round((double) it->value * totalSum / (double) sumOutcome);
+            tax = std::round((double) tempPrize * BET_TAX_RATE);
+            eco.destroyCoins(tax);
+            std::find(bettorList.begin(), bettorList.end(), it->bettorID)->balance += tempPrize - tax;
+            tempResponse.bettorID = it->bettorID;
+            tempResponse.prize = tempPrize - tax;
+            outputList.push_back(tempResponse);
+        }
+    }
+
+    writeFile();
+
+    return outputList;
 }
 
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
