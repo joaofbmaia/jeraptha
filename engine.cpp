@@ -147,6 +147,20 @@ std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
     return outputList;
 }
 
+void engine::cancel(int wagerID) {
+    auto wagerPtr = getWager(wagerID);
+
+    wagerPtr->open = false;
+    wagerPtr->active = false;
+    wagerPtr->canceled = true;
+
+    for (auto it = wagerPtr->betList.begin(); it != wagerPtr->betList.end(); it++) {
+        std::find(bettorList.begin(), bettorList.end(), it->bettorID)->balance += it->value;
+    }
+
+    writeFile();    
+}
+
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
     std::list <std::string> newBettors;
 

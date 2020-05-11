@@ -257,6 +257,9 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                     if (wageringEngine->getWager(wagerID) == nullptr) {
                         sendMessage(message.channelID, std::string("There's no wager with that ID."));
                     }
+                    else if (!wageringEngine->getWager(wagerID)->active) {
+                        sendMessage(message.channelID, std::string("That wager is inactive."));
+                    }
                     else {
                         auto prizeList = wageringEngine->settle(wagerID, outcome);
                         if (prizeList.empty()) {
@@ -271,6 +274,36 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                             buffer << "Congratulations to the winners! :partying_face: :dollar:";
                             sendMessage(message.channelID, buffer.str());
                         }
+                    }
+                }
+            }
+            else {
+                sendMessage(message.channelID, "You do not have permission to use this command.");
+            }
+        }
+
+        // wager cancel <wagerID>
+        command = "wager cancel ";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            //check if author has admin role
+            auto roles = getMember(message.serverID, message.author.ID).cast().roles;
+            if (std::find(roles.begin(), roles.end(), config->adminRoleID) != roles.end()
+                || message.author.ID == config->ownerID) {
+                int wagerID;
+                int ret = sscanf(message.content.substr(config->prefix.length() + command.length()).c_str(), "%d", &wagerID);
+                if (ret != 1) {
+                    sendMessage(message.channelID, std::string("Invalid format."));
+                }
+                else {
+                    if (wageringEngine->getWager(wagerID) == nullptr) {
+                        sendMessage(message.channelID, std::string("There's no wager with that ID."));
+                    }
+                    else if (!wageringEngine->getWager(wagerID)->active) {
+                        sendMessage(message.channelID, std::string("That wager is inactive."));
+                    }
+                    else {
+                        wageringEngine->cancel(wagerID);
+                        sendMessage(message.channelID, std::string("Wager canceled. Credits were returned to bettors."));
                     }
                 }
             }
