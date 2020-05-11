@@ -147,6 +147,11 @@ std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
         }
     }
 
+    // if theres a bet but no winner destroy coins
+    if (sumOutcome == 0 && totalSum != 0) {
+        eco.destroyCoins(totalSum);
+    }
+
     writeFile();
 
     return outputList;
