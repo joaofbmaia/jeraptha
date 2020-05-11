@@ -23,8 +23,10 @@ class engine {
         int addBet(std::string bettorID, int wagerID, bool outcome, int value);
         std::list <settleResponse> settle(int wagerID, bool outcome);
         void cancel(int wagerID);
+        void close(int wagerID);
         std::list <std::string> checkNewBettors(std::list <std::string> *membersList);
         wager *getWager(int wagerID);
+        void updateClosedBets();
     private:
         void readFile();
         void writeFile();

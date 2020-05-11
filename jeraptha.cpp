@@ -147,7 +147,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
         }
 
-        // register wager <description> <duration>
+        // register wager <duration> <description>
         command = "register wager ";
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
             std::string rawWager = message.content.substr(config->prefix.length() + command.length());
@@ -220,7 +220,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 else outcome = false;
                 int allowed = wageringEngine->addBet(message.author.ID, wagerID, outcome, value);
                 if (allowed == 1) {
-                    sendMessage(message.channelID, message.author.username + std::string(" bet ") + std::to_string(value) + std::string(" credits on ") + (outcome ? std::string("YES") : std::string("NO")) + std::string(" for \\\"") + wageringEngine->getWager(wagerID)->description + std::string(" \\\"."));
+                    sendMessage(message.channelID, message.author.username + std::string(" bet ") + std::to_string(value) + std::string(" credits on ") + (outcome ? std::string("YES") : std::string("NO")) + std::string(" for \\\"") + wageringEngine->getWager(wagerID)->description + std::string("\\\"."));
                 }
                 else if (allowed == 0) {
                     sendMessage(message.channelID, message.author.username + std::string(", you do not have enough credits to make this bet."));
@@ -304,6 +304,40 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                     else {
                         wageringEngine->cancel(wagerID);
                         sendMessage(message.channelID, std::string("Wager canceled. Credits were returned to bettors."));
+                    }
+                }
+            }
+            else {
+                sendMessage(message.channelID, "You do not have permission to use this command.");
+            }
+        }
+
+        // wager close <wagerID>
+        command = "wager close ";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            //check if author has admin role
+            auto roles = getMember(message.serverID, message.author.ID).cast().roles;
+            if (std::find(roles.begin(), roles.end(), config->adminRoleID) != roles.end()
+                || message.author.ID == config->ownerID) {
+                int wagerID;
+                int ret = sscanf(message.content.substr(config->prefix.length() + command.length()).c_str(), "%d", &wagerID);
+                if (ret != 1) {
+                    sendMessage(message.channelID, std::string("Invalid format."));
+                }
+                else {
+                    wageringEngine->updateClosedBets();
+                    if (wageringEngine->getWager(wagerID) == nullptr) {
+                        sendMessage(message.channelID, std::string("There's no wager with that ID."));
+                    }
+                    else if (!wageringEngine->getWager(wagerID)->active) {
+                        sendMessage(message.channelID, std::string("That wager is inactive."));
+                    }
+                    else if (!wageringEngine->getWager(wagerID)->open) {
+                        sendMessage(message.channelID, std::string("That wager is already closed."));
+                    }
+                    else {
+                        wageringEngine->close(wagerID);
+                        sendMessage(message.channelID, std::string("Wager closed. New bets can no longer be placed."));
                     }
                 }
             }

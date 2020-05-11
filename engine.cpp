@@ -58,6 +58,8 @@ int engine::registerWager(std::string description, std::string creatorID, std::t
 std::list <int> engine::listActiveWagers() {
     std::list <int> activeWagers;
 
+    updateClosedBets();
+
     for (auto it = wagerList.begin(); it != wagerList.end(); it++) {
         if (it->active) {
             activeWagers.push_back(it->ID);
@@ -76,6 +78,8 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
     if (wagerPtr == nullptr) {
         return -1; // No wager with that id
     }
+
+    updateClosedBets();
     if (!wagerPtr->open) {
         return -2; // No open wager with that id
     }
@@ -110,6 +114,7 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
 
 std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
     auto wagerPtr = getWager(wagerID);
+    if (wagerPtr == nullptr) return {};
 
     wagerPtr->outcome = outcome;
     wagerPtr->open = false;
@@ -149,6 +154,7 @@ std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
 
 void engine::cancel(int wagerID) {
     auto wagerPtr = getWager(wagerID);
+    if (wagerPtr == nullptr) return;
 
     wagerPtr->open = false;
     wagerPtr->active = false;
@@ -159,6 +165,14 @@ void engine::cancel(int wagerID) {
     }
 
     writeFile();    
+}
+
+void engine::close(int wagerID) {
+    auto wagerPtr = getWager(wagerID);
+    if (wagerPtr == nullptr) return;
+
+    wagerPtr->open = false;
+    writeFile();
 }
 
 std::list <std::string> engine::checkNewBettors(std::list <std::string> *membersList) {
@@ -193,6 +207,17 @@ wager *engine::getWager(int wagerID) {
         return &*res;
     }
     return nullptr;
+}
+
+void engine::updateClosedBets() {
+    for (auto it = wagerList.begin(); it != wagerList.end(); it++) {
+        if (it->active && it->duration != 0) {
+            if (time(NULL) > it->date + (it->duration * 86400)) {
+                it->open = false;
+            }
+        }
+    }
+    writeFile();
 }
 
 void engine::readFile() {
