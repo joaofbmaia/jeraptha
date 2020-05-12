@@ -415,7 +415,29 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             if (message.serverID == config->serverID) {
                 sendMessage(message.channelID, std::string("Sent you a DM!"));
             }
-            sendMessage(std::string(dmChannel.ID), std::string("help placeholder"));
+            std::stringstream helpString;
+            helpString << "Hello! I'm Jeraptha, the wagering bot!\\n\\n";
+            helpString << "**User commands:**\\n\\n";
+            helpString << "*register wager <duration> <description>*\\n";
+            helpString << "Creates a wager that's open for betting during <duration> days. To make this wager open indefinitely user 0 for <duration>.\\nOpening a wager will cost you 5 credits.\\n\\n";
+            helpString << "*list wagers*\\n";
+            helpString << "Lists all active wagers.\\n\\n";
+            helpString << "*wager details <ID>*\\n";
+            helpString << "Lists details for a wager with a certain <ID>.\\n\\n";
+            helpString << "*bet <ID> <yes/no> <ammount>*\\n";
+            helpString << "Creates a bet on the wager with that <ID> with the choosen <ammount> of credits. You can only bet \\\"yes\\\" or \\\"no\\\".\\n\\n";
+            helpString << "*balance*\\n";
+            helpString << "Shows your balance of credits.\\n\\n";
+            helpString << "*daily*\\n";
+            helpString << "Gifts you a random ammount of credits. Can only be used once every 24 hours.\\n\\n";
+            helpString << "**Admin commands:**\\n\\n";
+            helpString << "*wager close <ID>*\\n";
+            helpString << "Manually closes betting for wager with that <ID>.\\n\\n";
+            helpString << "*wager settle <ID> <outcome>*\\n";
+            helpString << "Settles the wager with that <ID>, closing it and distributing the prizes. The <outcome> must be \\\"yes\\\" or \\\"no\\\".\\n\\n";
+            helpString << "*wager cancel <ID>*\\n";
+            helpString << "Cancels all bets on the wager with that <ID> and returns the credits back to bettors.\\n";
+            sendMessage(std::string(dmChannel.ID), helpString.str());
         }
 
     }
