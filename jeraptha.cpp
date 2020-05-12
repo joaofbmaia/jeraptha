@@ -391,7 +391,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 buffer << "Total ammount bet on this wager: " << wageringEngine->getWager(wagerID)->openInterest() << " credits\\n";
 
                 for (auto it = wageringEngine->getWager(wagerID)->betList.begin(); it != wageringEngine->getWager(wagerID)->betList.end(); it++) {
-                    buffer << getMember(config->serverID, it->bettorID).cast().user.username << ": ";
+                    buffer << "- " << getMember(config->serverID, it->bettorID).cast().user.username << ": ";
                     buffer << it->value << " credits on ";
                     buffer << (it->outcome ? "YES :white_check_mark:" : "NO :x:") << "\\n";
                 }
