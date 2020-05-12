@@ -105,6 +105,7 @@ int engine::addBet(std::string bettorID, int wagerID, bool outcome, int value) {
     auxBet.value = value;
 
     bettorIt->balance -= value;
+    bettorIt->plays++;
     wagerPtr->betList.push_back(auxBet);
 
     writeFile();
@@ -141,6 +142,7 @@ std::list <settleResponse>  engine::settle(int wagerID, bool outcome) {
             tax = std::round((double) tempPrize * BET_TAX_RATE);
             eco.destroyCoins(tax);
             std::find(bettorList.begin(), bettorList.end(), it->bettorID)->balance += tempPrize - tax;
+            std::find(bettorList.begin(), bettorList.end(), it->bettorID)->wins++;
             tempResponse.bettorID = it->bettorID;
             tempResponse.prize = tempPrize - tax;
             outputList.push_back(tempResponse);
