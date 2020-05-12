@@ -373,11 +373,17 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                     buffer << " (Settled)";
                     buffer << "\\nOutcome: " << (wageringEngine->getWager(wagerID)->outcome ? "YES :white_check_mark:" : "NO :x:");
                 }
-                else if (!wageringEngine->getWager(wagerID)->canceled) {
+                else if (wageringEngine->getWager(wagerID)->canceled) {
                     buffer << " (Canceled)";
                 }
                 else if (!wageringEngine->getWager(wagerID)->open) {
                     buffer << " (Closed)";
+                }
+                else if (wageringEngine->getWager(wagerID)->duration == 0) {
+                    buffer << " (Active)";
+                }
+                else {
+                    buffer << " (Active for " << wageringEngine->getWager(wagerID)->duration << " days)";
                 }
 
                 buffer << "\\nCreated by " << getMember(config->serverID, wageringEngine->getWager(wagerID)->creatorID).cast().user.username << " on ";
