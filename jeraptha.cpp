@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <list>
 #include <ctime>
+#include <iomanip>
 #include <stdio.h>
 
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
@@ -343,6 +344,55 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
             else {
                 sendMessage(message.channelID, "You do not have permission to use this command.");
+            }
+        }
+
+        // wager details <wagerID>
+        command = "wager details ";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            int wagerID;
+            int ret = sscanf(message.content.substr(config->prefix.length() + command.length()).c_str(), "%d", &wagerID);
+            if (ret != 1) {
+                sendMessage(message.channelID, std::string("Invalid format."));
+            }
+            else {
+                wageringEngine->updateClosedBets();
+                if (wageringEngine->getWager(wagerID) == nullptr) {
+                    sendMessage(message.channelID, std::string("There's no wager with that ID."));
+                }
+                else {
+                    std::stringstream buffer;
+                    buffer << wagerID << ": " << wageringEngine->getWager(wagerID)->description << "\\n";
+                if (wageringEngine->getWager(wagerID)->betList.size() != 0) {
+                    buffer << ":white_check_mark: " << wageringEngine->getWager(wagerID)->odds(true) << "% | :x: " << wageringEngine->getWager(wagerID)->odds(false) << "%";
+                }
+                else {
+                    buffer << "No bets yet! :disappointed_relieved:";
+                }
+                if (!wageringEngine->getWager(wagerID)->active && !wageringEngine->getWager(wagerID)->canceled) {
+                    buffer << " (Settled)";
+                    buffer << "\\nOutcome: " << (wageringEngine->getWager(wagerID)->outcome ? "YES :white_check_mark:" : "NO :x:");
+                }
+                else if (!wageringEngine->getWager(wagerID)->canceled) {
+                    buffer << " (Canceled)";
+                }
+                else if (!wageringEngine->getWager(wagerID)->open) {
+                    buffer << " (Closed)";
+                }
+
+                buffer << "\\nCreated by " << getMember(config->serverID, wageringEngine->getWager(wagerID)->creatorID).cast().user.username << " on ";
+                buffer << std::put_time(std::gmtime(&wageringEngine->getWager(wagerID)->date), "%Y-%m-%d") << "\\n\\n";
+                buffer << "Total ammount bet on this wager: " << wageringEngine->getWager(wagerID)->openInterest() << " credits\\n";
+
+                for (auto it = wageringEngine->getWager(wagerID)->betList.begin(); it != wageringEngine->getWager(wagerID)->betList.end(); it++) {
+                    buffer << getMember(config->serverID, it->bettorID).cast().user.username << ": ";
+                    buffer << it->value << " credits on ";
+                    buffer << (it->outcome ? "YES :white_check_mark:" : "NO :x:") << "\\n";
+                }
+
+                sendMessage(message.channelID, buffer.str());
+
+                }
             }
         }
 
