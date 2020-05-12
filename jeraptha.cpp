@@ -70,7 +70,7 @@ void jerapthaClient::onMember(std::string *jsonMessage) {
 
 void jerapthaClient::onMessage(SleepyDiscord::Message message) {
     //server messages
-    if (message.startsWith(config->prefix) && message.serverID == config->serverID) {
+    if (message.startsWith(config->prefix) && message.serverID == config->serverID && !message.author.bot) {
         std::string command;
 
         // admin role @role
@@ -405,7 +405,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
     }
     
     //DM's + server messages
-    if (message.startsWith(config->prefix)) {
+    if (message.startsWith(config->prefix) && !message.author.bot) {
         std::string command;
 
         // help
