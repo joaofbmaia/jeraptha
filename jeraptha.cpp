@@ -390,8 +390,17 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 buffer << std::put_time(std::gmtime(&wageringEngine->getWager(wagerID)->date), "%Y-%m-%d") << "\\n\\n";
                 buffer << "Total ammount bet on this wager: " << wageringEngine->getWager(wagerID)->openInterest() << " credits\\n";
 
+                auto members = listMembers(config->serverID, 100).vector();
                 for (auto it = wageringEngine->getWager(wagerID)->betList.begin(); it != wageringEngine->getWager(wagerID)->betList.end(); it++) {
-                    buffer << "- " << getMember(config->serverID, it->bettorID).cast().user.username << ": ";
+                    std::string username = "[user left]";
+                    for (auto memberIT = members.begin(); memberIT != members.end(); memberIT++) {
+                        if (memberIT->user.ID == it->bettorID) {
+                            username = memberIT->user.username;
+                            break;
+                        }
+                    }
+
+                    buffer << "- " << username << ": ";
                     buffer << it->value << " credits on ";
                     buffer << (it->outcome ? "YES :white_check_mark:" : "NO :x:") << "\\n";
                 }
