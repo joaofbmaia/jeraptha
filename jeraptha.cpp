@@ -7,6 +7,7 @@
 #include <ctime>
 #include <iomanip>
 #include <stdio.h>
+#include <time.h>
 
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
 : SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), wageringEngine(gameEngine) {}
@@ -144,7 +145,20 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 sendMessage(message.channelID, message.author.username + std::string(", you have received ") + std::to_string(coins) + std::string(" credits."));
             }
             else {
-                sendMessage(message.channelID, message.author.username + std::string(", you've already redeemed you credits today."));
+                time_t timeLeft = 86400 - wageringEngine->timeElapsedDraw(message.author.ID);
+                auto timeLeftStruct = gmtime(&timeLeft);
+                std::stringstream buffer;
+                buffer << "Next daily available in ";
+                if (timeLeftStruct->tm_hour == 0 && timeLeftStruct->tm_min == 0) {
+                    buffer << timeLeftStruct->tm_sec << " seconds.";
+                }
+                else if (timeLeftStruct->tm_hour == 0 && timeLeftStruct->tm_min > 0) {
+                    buffer << timeLeftStruct->tm_min << " minutes and " << timeLeftStruct->tm_sec << " seconds.";
+                }
+                else {
+                    buffer << timeLeftStruct->tm_hour << " hours and " << timeLeftStruct->tm_min << " minutes.";
+                }
+                sendMessage(message.channelID, buffer.str());
             }
         }
 

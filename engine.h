@@ -17,6 +17,7 @@ class engine {
         engine(std::string filename);
         int balance(std::string ID);
         bool gift(std::string sourceID, std::string destinationID);
+        time_t timeElapsedDraw(std::string ID);
         int drawCoins(std::string ID);
         int registerWager(std::string description, std::string creatorID, std::time_t date, int duration);
         std::list <int> listActiveWagers();

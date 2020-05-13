@@ -22,11 +22,16 @@ int engine::balance(std::string ID) {
     return it->balance;
 }
 
+time_t engine::timeElapsedDraw(std::string ID) {
+    auto it = std::find(bettorList.begin(), bettorList.end(), ID);
+    return time(NULL) - it->lastDrawTime;
+}
+
 int engine::drawCoins(std::string ID) {
     std::list <bettor>::iterator it;
     it = std::find(bettorList.begin(), bettorList.end(), ID);
 
-    if (time(NULL) - it->lastDrawTime < 86400) {
+    if (timeElapsedDraw(ID) < 86400) {
         return -1;
     }
 
