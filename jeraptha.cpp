@@ -438,6 +438,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                     }
                 }
                 buffer << counter << ": " << username << " - " << wageringEngine->balance(*it) << " credits\\n";
+                counter++;
             }
             sendMessage(message.channelID, buffer.str());
         }
