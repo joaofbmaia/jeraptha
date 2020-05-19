@@ -232,6 +232,22 @@ void engine::updateClosedBets() {
     writeFile();
 }
 
+std::list <std::string> engine::getSortedBettors() {
+    std::list <std::string> bettorsIDs;
+    for (auto it = bettorList.begin(); it != bettorList.end(); it++) {
+        bettorsIDs.push_back(it->ID);
+    }
+
+    bettorsIDs.sort([&] (const std::string &ID1, const std::string &ID2) {return compareBalance(ID1, ID2);});
+    return bettorsIDs;
+}
+
+bool engine::compareBalance(const std::string &ID1, const std::string &ID2) {
+    int bal1 = std::find(bettorList.begin(), bettorList.end(), ID1)->balance;
+    int bal2 = std::find(bettorList.begin(), bettorList.end(), ID2)->balance;
+    return bal1 > bal2;
+}
+
 void engine::readFile() {
     std::ifstream file;
     int size;

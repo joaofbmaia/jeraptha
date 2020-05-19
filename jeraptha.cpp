@@ -14,7 +14,6 @@ jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const 
 
 void jerapthaClient::onReady(std::string *jsonMessage) {
     // Construct list with all members IDs as strings
-    //auto members = listMembers(config->serverID).list();
     std::list <std::string> membersIDs;
     auto members = listMembers(config->serverID, 100).vector();
 
@@ -22,7 +21,6 @@ void jerapthaClient::onReady(std::string *jsonMessage) {
         // exclude bots
         if (!it->user.bot) {
             membersIDs.push_back(std::string(it->user.ID));
-            //std::cout << std::string(it->user.ID) << std::endl;
         }
     }
 
@@ -43,7 +41,6 @@ void jerapthaClient::onReady(std::string *jsonMessage) {
 
 void jerapthaClient::onMember(std::string *jsonMessage) {
     // Construct list with all members IDs as strings
-    //auto members = listMembers(config->serverID).list();
     std::list <std::string> membersIDs;
     auto members = listMembers(config->serverID, 100).vector();
 
@@ -51,7 +48,6 @@ void jerapthaClient::onMember(std::string *jsonMessage) {
         // exclude bots
         if (!it->user.bot) {
             membersIDs.push_back(std::string(it->user.ID));
-            //std::cout << std::string(it->user.ID) << std::endl;
         }
     }
 
@@ -425,6 +421,27 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             }
         }
 
+        // ranking
+        command = "ranking";
+        if (!message.content.compare(config->prefix.length(), command.length(), command)) {
+            std::stringstream buffer;
+            auto members = listMembers(config->serverID, 100).vector();
+            auto sortedMembers = wageringEngine->getSortedBettors();
+
+            int counter = 1;
+            for (auto it = sortedMembers.begin(); it != sortedMembers.end(); it++) {
+                std::string username = "[user left]";
+                for (auto memberIT = members.begin(); memberIT != members.end(); memberIT++) {
+                    if (memberIT->user.ID == *it) {
+                        username = memberIT->user.username;
+                        break;
+                    }
+                }
+                buffer << counter << ": " << username << " - " << wageringEngine->balance(*it) << " credits\\n";
+            }
+            sendMessage(message.channelID, buffer.str());
+        }
+
     }
     
     //DM's + server messages
@@ -451,6 +468,8 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             helpString << "Creates a bet on the wager with that <ID> with the choosen <ammount> of credits. You can only bet \\\"yes\\\" or \\\"no\\\".\\n\\n";
             helpString << "*balance*\\n";
             helpString << "Shows your balance of credits.\\n\\n";
+            helpString << "*ranking*\\n";
+            helpString << "Shows the balance of credits of every member in order.\\n\\n";
             helpString << "*daily*\\n";
             helpString << "Gifts you a random ammount of credits. Can only be used once every 24 hours.\\n\\n";
             helpString << "**Admin commands:**\\n\\n";

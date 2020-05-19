@@ -28,7 +28,9 @@ class engine {
         std::list <std::string> checkNewBettors(std::list <std::string> *membersList);
         wager *getWager(int wagerID);
         void updateClosedBets();
+        std::list <std::string> getSortedBettors();
     private:
+        bool compareBalance(const std::string &ID1, const std::string &ID2);
         void readFile();
         void writeFile();
         std::string _filename;
