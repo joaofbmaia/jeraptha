@@ -9,13 +9,15 @@
 #include <stdio.h>
 #include <time.h>
 
+#define MAX_MEMBERS 100
+
 jerapthaClient::jerapthaClient(configuration *config, engine *gameEngine, const char numOfThreads)
 : SleepyDiscord::DiscordClient::WebsocketppDiscordClient(config->token, numOfThreads), config(config), wageringEngine(gameEngine) {}
 
 void jerapthaClient::onReady(std::string *jsonMessage) {
     // Construct list with all members IDs as strings
     std::list <std::string> membersIDs;
-    auto members = listMembers(config->serverID, 100).vector();
+    auto members = listMembers(config->serverID, MAX_MEMBERS).vector();
 
     for (auto it = members.begin(); it != members.end(); it++) {
         // exclude bots
@@ -42,7 +44,7 @@ void jerapthaClient::onReady(std::string *jsonMessage) {
 void jerapthaClient::onMember(std::string *jsonMessage) {
     // Construct list with all members IDs as strings
     std::list <std::string> membersIDs;
-    auto members = listMembers(config->serverID, 100).vector();
+    auto members = listMembers(config->serverID, MAX_MEMBERS).vector();
 
     for (auto it = members.begin(); it != members.end(); it++) {
         // exclude bots
@@ -400,7 +402,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 buffer << std::put_time(std::gmtime(&wageringEngine->getWager(wagerID)->date), "%Y-%m-%d") << "\\n\\n";
                 buffer << "Total ammount bet on this wager: " << wageringEngine->getWager(wagerID)->openInterest() << " credits\\n";
 
-                auto members = listMembers(config->serverID, 100).vector();
+                auto members = listMembers(config->serverID, MAX_MEMBERS).vector();
                 for (auto it = wageringEngine->getWager(wagerID)->betList.begin(); it != wageringEngine->getWager(wagerID)->betList.end(); it++) {
                     std::string username = "[user left]";
                     for (auto memberIT = members.begin(); memberIT != members.end(); memberIT++) {
@@ -425,7 +427,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
         command = "ranking";
         if (!message.content.compare(config->prefix.length(), command.length(), command)) {
             std::stringstream buffer;
-            auto members = listMembers(config->serverID, 100).vector();
+            auto members = listMembers(config->serverID, MAX_MEMBERS).vector();
             auto sortedMembers = wageringEngine->getSortedBettors();
 
             int counter = 1;
