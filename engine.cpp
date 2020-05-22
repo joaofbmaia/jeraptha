@@ -7,9 +7,6 @@
 #include <ctime>
 #include <cmath>
 
-#define BET_TAX_RATE 0.05
-#define WAGER_PRICE 5
-
 engine::engine(std::string filename) {
     _filename = filename;
     readFile();

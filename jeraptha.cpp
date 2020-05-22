@@ -178,7 +178,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
                 }
                 else {
                     if (duration > 0) {
-                        sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and a duration of ") + std::to_string(duration) + std::string(" days.\\nIt cost you 5 credits."));
+                        sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and a duration of ") + std::to_string(duration) + std::string(" days.\\nIt cost you ") + std::to_string(WAGER_PRICE) + std::string(" credits."));
                     }
                     else {
                         sendMessage(message.channelID, std::string("Registered wager \\\"") + std::string(descriptionString) + std::string("\\\" with ID ") + std::to_string(wagerID) + std::string(" and indefinite duration.\\nIt cost you 5 credits."));
@@ -462,7 +462,7 @@ void jerapthaClient::onMessage(SleepyDiscord::Message message) {
             helpString << "Hello! I'm Jeraptha, the wagering bot!\\n\\n";
             helpString << "**User commands:**\\n\\n";
             helpString << "*register wager <duration> <description>*\\n";
-            helpString << "Creates a wager that's open for betting during <duration> days. To make this wager open indefinitely user 0 for <duration>.\\nOpening a wager will cost you 5 credits.\\n\\n";
+            helpString << "Creates a wager that's open for betting during <duration> days. To make this wager open indefinitely user 0 for <duration>.\\nOpening a wager will cost you " << WAGER_PRICE << " credits.\\n\\n";
             helpString << "*list wagers*\\n";
             helpString << "Lists all active wagers.\\n\\n";
             helpString << "*wager details <ID>*\\n";

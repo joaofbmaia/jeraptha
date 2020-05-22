@@ -7,6 +7,9 @@
 #include "wager.h"
 #include "economy.h"
 
+#define BET_TAX_RATE 0.05
+#define WAGER_PRICE 5
+
 struct settleResponse {
     std::string bettorID;
     int prize;
